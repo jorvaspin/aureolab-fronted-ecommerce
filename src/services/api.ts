@@ -3,12 +3,13 @@ import axios from 'axios';
 // configuramos axios para manejar cookies
 axios.defaults.withCredentials = true;
 
-const BASE_URL = process.env.REACT_APP_API_URL;
+// usamos dotenv para cargar las variables de entorno
+const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
 
 // creamos un servicio para los productos
 export const productService = {
   async getProducts() {
-    const response = await axios.get(`${BASE_URL}/products`);
+    const response = await axios.get(`${BACKEND_URL}/products`);
     console.log(response.data);
     // Devuelve directamente el array de productos
     return response.data.products;
@@ -22,7 +23,7 @@ export const cartService = {
       // obtenemos cartId de localStorage
       const cartId = localStorage.getItem('cartId');
       
-      const response = await axios.get(`${BASE_URL}/carts`, {
+      const response = await axios.get(`${BACKEND_URL}/carts`, {
         params: { cartId } // enviamos cartId como parámetro
       });
 
@@ -44,7 +45,7 @@ export const cartService = {
       // obtenemos cartId de localStorage
       const cartId = localStorage.getItem('cartId');
 
-      const response = await axios.post(`${BASE_URL}/carts/add`, { 
+      const response = await axios.post(`${BACKEND_URL}/carts/add`, { 
         productId, 
         quantity,
         cartId // enviamos cartId en el cuerpo
@@ -60,7 +61,7 @@ export const cartService = {
   async removeFromCart(itemId: number) {
     try {
       console.log(itemId);
-      const response = await axios.delete(`${BASE_URL}/carts/remove/${itemId}`);
+      const response = await axios.delete(`${BACKEND_URL}/carts/remove/${itemId}`);
 
       return response.data;
     } catch (error) {
@@ -72,7 +73,7 @@ export const cartService = {
   // creamos una orden de pago con los items del carrito
   // async checkout(checkoutData: { cartItems: { productId: number; quantity: number }[] }, cartId: string) {
   async checkout(cartId: string) {
-    const response = await axios.post(`${BASE_URL}/orders/checkout`, { cartId: cartId });
+    const response = await axios.post(`${BACKEND_URL}/orders/checkout`, { cartId: cartId });
 
     return response.data.checkoutUrl;
   }
