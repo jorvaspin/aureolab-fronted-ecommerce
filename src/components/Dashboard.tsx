@@ -19,6 +19,9 @@ interface Order {
 }
 
 const Dashboard: React.FC = () => {
+
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [refundAmount, setRefundAmount] = useState<number>(0);
@@ -27,7 +30,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await axios.get('http://localhost:3015/api/orders', {
+        const response = await axios.get(`${BACKEND_URL}/orders`, {
           withCredentials: true
         });
         // filtramos las órdenes con items
@@ -42,13 +45,13 @@ const Dashboard: React.FC = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, [BACKEND_URL]);
 
   const handleRefund = async () => {
     if (!selectedOrder) return;
 
     try {
-      const response = await axios.post(`http://localhost:3015/api/orders/${selectedOrder.id}/refund`, {
+      const response = await axios.post(`${BACKEND_URL}/orders/${selectedOrder.id}/refund`, {
         amount: refundAmount
       }, {
         withCredentials: true

@@ -9,13 +9,15 @@ import DashboardPage from './pages/DashboardPage';
 import axios from 'axios';
 
 const App: React.FC = () => {
+  const BACKEND_URL = import.meta.env.VITE_BACKEND_API_URL;
+  
   useEffect(() => {
     const initializeCart = async () => {
       try {
         let cartId = localStorage.getItem('cartId');
 
         if (!cartId) {
-          const response = await axios.get('http://localhost:3015/api/carts', {
+          const response = await axios.get(`${BACKEND_URL}/carts`, {
             withCredentials: true
           });
 
