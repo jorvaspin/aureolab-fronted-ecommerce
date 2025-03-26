@@ -2,8 +2,8 @@ import axios from 'axios';
 
 // configuramos axios para manejar cookies
 axios.defaults.withCredentials = true;
-// LUEGO AÑADIR AL .ENV: REACT_APP_API_URL=http://localhost:3015/api
-const BASE_URL = 'http://localhost:3015/api';
+
+const BASE_URL = process.env.REACT_APP_API_URL;
 
 // creamos un servicio para los productos
 export const productService = {
