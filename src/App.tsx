@@ -6,6 +6,8 @@ import { StripeProvider } from './services/stripeService';
 import MainLayout from './components/MainLayout';
 import CheckoutPage from './pages/CheckoutPage';
 import DashboardPage from './pages/DashboardPage';
+import OrderSuccessPage from './pages/OrderSuccessPage';
+import OrderCancelPage from './pages/OrderCancelPage';
 import axios from 'axios';
 
 const App: React.FC = () => {
@@ -30,7 +32,7 @@ const App: React.FC = () => {
     };
 
     initializeCart();
-  }, []);
+  }, [BACKEND_URL]);
 
   return (
     <Provider store={store}>
@@ -40,6 +42,8 @@ const App: React.FC = () => {
             <Route path="/" element={<MainLayout />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/order-success" element={<OrderSuccessPage />} />
+            <Route path="/order-cancel" element={<OrderCancelPage />} />
           </Routes>
         </Router>
       </StripeProvider>
