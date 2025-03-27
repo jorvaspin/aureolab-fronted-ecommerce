@@ -21,15 +21,33 @@ El objetivo es poder dentro de la página hacer:
 
 ---
 
--- Mostrar una lista de productos disponibles.
--- Agregar productos a un carrito de compras.
--- Permitir realizar pagos a través de Stripe.
--- Sección de órdenes de compra donde se pueda:
--- Solicitar un reembolso total o parcial.
+- Mostrar una lista de productos disponibles.
+- Agregar productos a un carrito de compras.
+- Permitir realizar pagos a través de Stripe.
+- Sección de órdenes de compra donde se pueda:
+- Solicitar un reembolso total o parcial.
 
 ---
 
---
+# DEMO
+
+```
+
+https://aureolab-fronted.netlify.app/
+
+```
+
+# Capturas de pantalla
+
+<div align="center">
+  <img src="https://i.imgur.com/9wWXrTK.png" width="300" style="margin: 0 10px;">
+  <img src="https://i.imgur.com/7jgi9Pn.png" width="300" style="margin: 0 10px;">
+  <img src="https://i.imgur.com/Ikc7Bhr.png" width="300" style="margin: 0 10px;">
+  <img src="https://i.imgur.com/cBVE1L7.png" width="300" style="margin: 0 10px;">
+  <img src="https://i.imgur.com/Yji4wHy.png" width="300" style="margin: 0 10px;">
+</div>
+
+---
 
 # 📁 Ejecución del proyecto
 
