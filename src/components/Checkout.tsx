@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useStripe } from '@stripe/react-stripe-js';
-import {useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { RootState } from '../redux/store';
 import { cartService } from '../services/api';
+import PaymentCardLogos from './PaymentCardLogos';
+import { ShoppingCart } from 'lucide-react';
 
-// definimos la forma de checkout (PUEDE CAMBIAR)
 interface CheckoutForm {
   email: string;
   phone: string;
@@ -19,7 +20,6 @@ interface CheckoutForm {
 
 const Checkout: React.FC = () => {
   const stripe = useStripe();
-  //const dispatch: AppDispatch = useDispatch();
   const { cart } = useSelector((state: RootState) => state.cart);
 
   const [formData, setFormData] = useState<CheckoutForm>({
@@ -34,19 +34,17 @@ const Checkout: React.FC = () => {
     }
   });
 
-  // manejamos el cambio de los inputs
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     
-    // Si es un campo de nivel superior (email o phone)
     if (name === 'email' || name === 'phone') {
       setFormData(prev => ({
         ...prev,
         [name]: value
       }));
-    } 
-    // Si es un campo de dirección
-    else {
+    } else {
       const [section, field] = name.split('.');
       setFormData(prev => ({
         ...prev,
@@ -58,105 +56,144 @@ const Checkout: React.FC = () => {
     }
   };
 
-  // manejamos el submit del formulario
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       if (!cart?.items) {
         throw new Error('El carrito está vacío');
       }
 
-      // formateamos los items del carrito
-      // const formattedCartItems = {
-      //   cartItems: cart.items.map(item => ({
-      //     productId: item.product.id,
-      //     quantity: item.quantity
-      //   }))
-      // };
-
-      // enviamos la información de checkout tanto los items como el cartId para generar el order
-      // const checkoutResponse = await cartService.checkout(formattedCartItems, cart.id);
       const checkoutResponse = await cartService.checkout(cart.id);
-      // enviamos al proceso de pago de stripe
-      window.location.href = checkoutResponse
-
+      window.location.href = checkoutResponse;
     } catch (error) {
       console.error('Checkout error', error);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-6">Checkout</h2>
-      <form onSubmit={handleSubmit} className="bg-white shadow-md rounded-lg p-6">
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Campos de contacto */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Información de Contacto</h3>
-            <input
-              type="email"
-              name="email"
-              placeholder="Correo electrónico"
-              value={formData.email}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded mb-4"
-              required
-            />
-            <input
-              type="tel"
-              name="phone"
-              placeholder="Teléfono"
-              value={formData.phone}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded"
-              required
-            />
+    <div className="flex bg-gray-50">
+      <div className="container mx-auto px-4 py-0 grid gap-8">
+        {/* Payment Details */}
+        <div className="bg-white shadow-md rounded-lg">
+          <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+              <ShoppingCart className="mr-3 text-blue-600" size={28} />
+              Detalles de Pago
+            </h2>
           </div>
+          
+          <form onSubmit={handleSubmit} className="p-6">
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Contact Information */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4 text-gray-700">Información de Contacto</h3>
+                <div className="space-y-4">
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Correo electrónico"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-200 transition duration-300"
+                    required
+                  />
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Teléfono"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-200 transition duration-300"
+                    required
+                  />
+                </div>
+              </div>
 
-          {/* Campos de dirección de facturación */}
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Dirección de Facturación</h3>
-            <input
-              type="text"
-              name="billingAddress.street"
-              placeholder="Calle"
-              value={formData.billingAddress.street}
-              onChange={handleInputChange}
-              className="w-full p-2 border rounded mb-4"
-              required
-            />
-            <div className="grid grid-cols-2 gap-4">
-              <input
-                type="text"
-                name="billingAddress.city"
-                placeholder="Ciudad"
-                value={formData.billingAddress.city}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded"
-                required
-              />
-              <input
-                type="text"
-                name="billingAddress.state"
-                placeholder="Estado"
-                value={formData.billingAddress.state}
-                onChange={handleInputChange}
-                className="w-full p-2 border rounded"
-                required
-              />
+              {/* Billing Address */}
+              <div>
+                <h3 className="text-lg font-semibold mb-4 text-gray-700">Dirección de Facturación</h3>
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    name="billingAddress.street"
+                    placeholder="Dirección"
+                    value={formData.billingAddress.street}
+                    onChange={handleInputChange}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-200 transition duration-300"
+                    required
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      name="billingAddress.city"
+                      placeholder="Ciudad"
+                      value={formData.billingAddress.city}
+                      onChange={handleInputChange}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-200 transition duration-300"
+                      required
+                    />
+                    <input
+                      type="text"
+                      name="billingAddress.state"
+                      placeholder="Estado"
+                      value={formData.billingAddress.state}
+                      onChange={handleInputChange}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-200 transition duration-300"
+                      required
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <button 
-          type="submit" 
-          disabled={!stripe}
-          className="mt-6 w-full bg-primary text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
-        >
-          Pagar Ahora
-        </button>
-      </form>
+            {/* Payment Methods */}
+            <div className="mt-4 text-center">
+              <PaymentCardLogos />
+            </div>
+
+            {/* Submit Button */}
+            <button 
+              type="submit" 
+              disabled={!stripe || isLoading}
+              className="mt-6 w-full bg-blue-600 text-white py-3 rounded-md 
+                hover:bg-blue-700 transition duration-300 
+                flex items-center justify-center 
+                disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <svg 
+                    className="animate-spin h-5 w-5 mr-3" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    fill="none" 
+                    viewBox="0 0 24 24"
+                  >
+                    <circle 
+                      className="opacity-25" 
+                      cx="12" 
+                      cy="12" 
+                      r="10" 
+                      stroke="currentColor" 
+                      strokeWidth="4"
+                    ></circle>
+                    <path 
+                      className="opacity-75" 
+                      fill="currentColor" 
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Procesando...
+                </div>
+              ) : (
+                'Pagar Ahora'
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

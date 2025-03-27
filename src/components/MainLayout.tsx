@@ -76,7 +76,6 @@ const MainLayout: React.FC<{ children?: React.ReactNode }> = ({ children }) => {
         >
           <div className="h-full flex flex-col">
             <div className="p-4 border-b flex justify-between items-center">
-              <h2 className="text-xl font-bold">Mi Carrito</h2>
               <button 
                 onClick={toggleSideCart} 
                 className="text-gray-600 hover:text-gray-900"

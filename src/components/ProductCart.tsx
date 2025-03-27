@@ -3,11 +3,8 @@ import { useDispatch } from 'react-redux';
 import { Product } from '../types/product';
 import { addToCart } from '../redux/cartSlice';
 import { AppDispatch } from '../redux/store';
-
-// Función de utilidad para formatear precio
-const formatPrice = (price: string | number): string => {
-  return Number(price).toFixed(2);
-};
+import { ShoppingCart, AlertTriangle, Star, Loader2 } from 'lucide-react';
+import { formatPrice } from '../utils/formaters';
 
 interface ProductCardProps {
   product: Product;
@@ -25,53 +22,86 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       await dispatch(addToCart({ 
         productId: product.id, 
         quantity: 1 
-      })).unwrap(); // esto lanzara un error si la acción es rechazada
+      })).unwrap();
       
+      // Optional: Add a toast or notification here
       console.log(`${product.name} añadido al carrito`);
     } catch (error) {
-      // Manejo de errores
-      console.log(error);
-      console.error('Error al añadir al carrito:');
+      console.error('Error al añadir al carrito:', error);
     } finally {
       setIsAdding(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 flex flex-col">
-      <img 
-        src={product.imageUrl || 'https://i.ibb.co/PZh01MkM/images-q-tbn-ANd9-Gc-TNNLEL-qmm-Le-FR1nx-Juep-FOg-PYfnw-HR56vcw-s.png'} 
-        alt={product.name} 
-        className="w-full h-48 object-cover rounded-t-lg"
-      />
-      <div className="mt-4 flex-grow">
-        <h3 className="text-xl font-bold text-gray-800">{product.name}</h3>
-        <p className="text-gray-600 mt-2">{product.description}</p>
-        <div className="mt-4 flex justify-between items-center">
-          <span className="text-2xl font-bold text-primary">
-            ${formatPrice(product.price)}
-          </span>
-          <span className="text-sm text-gray-500">
-            Stock: {product.stock}
-          </span>
+    <div className="group relative bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden border border-gray-100">
+      <div className="relative">
+        <img 
+          src={product.imageUrl || 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png'} 
+          alt={product.name} 
+          className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        {product.stock === 0 && (
+          <div className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-semibold flex items-center">
+            <AlertTriangle className="mr-2 h-4 w-4" />
+            Sin Stock
+          </div>
+        )}
+      </div>
+      
+      <div className="p-5">
+        <div className="flex justify-between items-center mb-3">
+          <h3 className="text-xl font-bold text-gray-800 truncate max-w-[70%]">
+            {product.name}
+          </h3>
+          <div className="flex items-center text-yellow-500">
+            <Star className="h-5 w-5 fill-current mr-1" />
+            <span className="text-sm font-medium">4.5</span>
+          </div>
+        </div>
+        
+        <p className="text-gray-600 text-sm mb-4 line-clamp-2 min-h-[3rem]">
+          {product.description || 'No hay descripción disponible'}
+        </p>
+        
+        <div className="flex justify-between items-center">
+          <div>
+            <span className="text-xl font-bold text-primary">
+              ${formatPrice(product.price)}
+            </span>
+            <span className="ml-2 text-sm text-gray-500">
+              Stock: {product.stock}
+            </span>
+          </div>
+          
+          <button 
+            onClick={handleAddToCart}
+            disabled={product.stock === 0 || isAdding}
+            className={`
+              relative rounded-full p-2 transition-all duration-300 flex items-center justify-center
+              ${product.stock > 0 
+                ? (isAdding 
+                  ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
+                  : 'bg-primary text-white hover:bg-blue-700') 
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'}
+            `}
+          >
+            {isAdding ? (
+              <Loader2 className="h-5 w-5 animate-spin" />
+            ) : (
+              <ShoppingCart className="h-5 w-5" />
+            )}
+            {isAdding && (
+              <span className="ml-2 text-sm">Añadiendo...</span>
+            )}
+          </button>
         </div>
       </div>
-      <button 
-        onClick={handleAddToCart}
-        disabled={product.stock === 0 || isAdding}
-        className={`mt-4 w-full py-2 rounded-md ${
-          product.stock > 0 
-            ? (isAdding 
-              ? 'bg-gray-400 text-white cursor-not-allowed' 
-              : 'bg-primary text-white hover:bg-blue-700')
-            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-        }`}
-      >
-        {isAdding 
-          ? 'Añadiendo...' 
-          : (product.stock > 0 ? 'Añadir al Carrito' : 'Sin Stock')
-        }
-      </button>
+
+      {/* Cart Addition Animation */}
+      {isAdding && (
+        <div className="absolute inset-0 bg-primary bg-opacity-20 animate-pulse pointer-events-none"></div>
+      )}
     </div>
   );
 };

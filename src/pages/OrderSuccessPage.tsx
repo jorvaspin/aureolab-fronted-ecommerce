@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import MainLayout from '../components/MainLayout';
 import { CheckCircleIcon } from 'lucide-react';
+import { formatPrice } from '../utils/formaters';
 
 const OrderSuccessPage: React.FC = () => {
   const [searchParams] = useSearchParams();
@@ -29,7 +30,7 @@ const OrderSuccessPage: React.FC = () => {
           const response = await axios.get(`${BACKEND_URL}/stripe/verify-stripe-session/${sessionId}`, {
             withCredentials: true
           });
-          
+          console.log(response.data);
           setOrderDetails(response.data);
           setLoading(false);
         } else {
@@ -44,7 +45,7 @@ const OrderSuccessPage: React.FC = () => {
     };
 
     fetchOrderDetails();
-    
+
   }, [sessionId]);
 
   if (loading) {
@@ -87,7 +88,7 @@ const OrderSuccessPage: React.FC = () => {
                 Número de Orden: #{orderDetails.orderId}
               </p>
               <p className="text-green-700 mt-2">
-                Total: ${orderDetails.total}
+                Total: ${formatPrice(orderDetails.total)}
               </p>
             </div>
           )}

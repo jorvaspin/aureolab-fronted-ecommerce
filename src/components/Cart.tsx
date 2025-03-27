@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RootState, AppDispatch } from '../redux/store';
 import { fetchCart, removeFromCart } from '../redux/cartSlice';
+import { Trash2, ShoppingCart, Package } from 'lucide-react';
+import { formatPrice } from '../utils/formaters';
 
 const Cart: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
@@ -13,12 +15,6 @@ const Cart: React.FC = () => {
   useEffect(() => {
     dispatch(fetchCart());
   }, [dispatch]);
-
-  // formateamos el precio a dos decimales
-  const formatPrice = (price: number | string): string => {
-    const numPrice = Number(price);
-    return isNaN(numPrice) ? "0.00" : numPrice.toFixed(2);
-  };
 
   // calculamos el total del carrito
   const calculateTotal = () => {
@@ -59,72 +55,77 @@ const Cart: React.FC = () => {
   }
 
   return (
-    <>
+    <div className="flex flex-col h-full">
+      <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-800 flex items-center">
+          <ShoppingCart className="mr-3 text-blue-600" size={28} />
+          Mi Carrito
+        </h2>
+      </div>
+
       {cart?.items.length === 0 ? (
-        <p className="text-center text-gray-600">Tu carrito está vacío</p>
+        <div className="flex flex-col items-center justify-center flex-grow p-6 text-center">
+          <Package className="text-gray-400 mb-4" size={64} />
+          <p className="text-gray-600 text-lg">El carrito esta vacio</p>
+          <p className="text-gray-500 text-sm mb-4">Explore los productos y compre!</p>
+        </div>
       ) : (
         <>
-          <div>
+          <div className="flex-grow overflow-y-auto p-4 space-y-4">
             {cart?.items.map(item => (
               <div 
                 key={item.id} 
-                className="flex items-center justify-between py-2 border-b"
+                className="bg-white shadow-sm rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-shadow duration-300"
               >
-                <div className="flex items-center">
+                <div className="flex items-center space-x-4">
                   <img 
-                    src={item.product.imageUrl || 'https://i.ibb.co/PZh01MkM/images-q-tbn-ANd9-Gc-TNNLEL-qmm-Le-FR1nx-Juep-FOg-PYfnw-HR56vcw-s.png'} 
+                    src={item.product.imageUrl || 'https://upload.wikimedia.org/wikipedia/commons/a/a3/Image-not-found.png'}
                     alt={item.product.name} 
-                    className="w-16 h-16 object-cover rounded-md mr-4"
+                    className="w-20 h-20 object-cover rounded-md"
                   />
                   <div>
-                    <h3 className="text-md font-bold">{item.product.name}</h3>
-                    <p className="text-gray-600">${formatPrice(item.product.price)}</p>
+                    <h3 className="font-semibold text-gray-800">{item.product.name}</h3>
+                    <p className="text-gray-500 text-sm">
+                      ${formatPrice(item.product.price)} x {item.quantity}
+                    </p>
                   </div>
                 </div>
-                <div className="flex items-center">
-                  <span className="mx-2">Cantidad: {item.quantity}</span>
-                  <span className="font-bold mr-4">
+                <div className="flex items-center space-x-4">
+                  <span className="font-bold text-gray-800">
                     ${formatPrice(item.product.price * item.quantity)}
                   </span>
                   <button 
                     onClick={() => handleRemoveItem(item.product.id)}
-                    className="text-red-500 hover:bg-red-100 p-2 rounded-full transition"
+                    className="text-red-500 hover:bg-red-50 p-2 rounded-full transition"
                   >
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      className="h-5 w-5" 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
-                      stroke="currentColor"
-                    >
-                      <path 
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        strokeWidth={2} 
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" 
-                      />
-                    </svg>
+                    <Trash2 size={20} />
                   </button>
                 </div>
               </div>
             ))}
-            <div className="mt-4 text-right">
-              <h3 className="text-xl font-bold">
-                Total: ${formatPrice(calculateTotal())}
-              </h3>
-              {!isCheckoutPage && (
-                <button 
-                  onClick={handleProceedToCheckout}
-                  className="mt-2 w-full bg-primary text-white px-4 py-2 rounded-md hover:bg-blue-700"
-                >
-                  Proceder al Checkout
-                </button>
-              )}
+          </div>
+
+          <div className="p-6 border-t border-gray-200 bg-gray-50">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-gray-600">Subtotal</span>
+              <span className="text-xl font-bold text-gray-800">
+                ${formatPrice(calculateTotal())}
+              </span>
             </div>
+
+            {!isCheckoutPage && (
+              <button 
+                onClick={handleProceedToCheckout}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300 flex items-center justify-center space-x-2"
+              >
+                <ShoppingCart size={20} />
+                <span>Checkout</span>
+              </button>
+            )}
           </div>
         </>
       )}
-    </>
+    </div>
   );
 };
 
