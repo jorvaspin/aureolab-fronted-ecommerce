@@ -23,7 +23,8 @@ const Dashboard: React.FC = () => {
   const { 
     totalRevenue, 
     pendingOrders, 
-    completedOrders 
+    completedOrders,
+    refundedOrders
   } = calculateMetrics();
 
   // Handler to select an order
@@ -46,6 +47,7 @@ const Dashboard: React.FC = () => {
             totalRevenue={totalRevenue}
             completedOrdersCount={completedOrders.length}
             pendingOrdersCount={pendingOrders.length}
+            refundedOrdersCount={refundedOrders.length}
           />
         </div>
         

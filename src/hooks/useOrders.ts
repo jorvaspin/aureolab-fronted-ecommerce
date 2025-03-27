@@ -34,7 +34,11 @@ export const useOrders = (backendUrl: string) => {
       order.status === 'COMPLETED' || order.status === 'PAID'
     );
 
-    return { totalRevenue, pendingOrders, completedOrders };
+    // los refunds realizados
+    const refundedOrders = orders.filter(order => order.status === 'REFUNDED' || order.status === 'PARTIALLY_REFUNDED');
+
+
+    return { totalRevenue, pendingOrders, completedOrders, refundedOrders };
   };
 
   return { 
